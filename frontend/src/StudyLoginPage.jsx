@@ -16,7 +16,7 @@ function StudyLoginPage(props) {
         };
     const handleRegister = async () => {
         try {
-            const response = await axios.post("https://task-npud.onrender.com/register", { username, password });
+            const response = await axios.post(" https://task-npud.onrender.com/register", { username, password });
             if (response.status === 201) {
                 alert("Account created! Log in now.");
                 setIsRegistering(false);

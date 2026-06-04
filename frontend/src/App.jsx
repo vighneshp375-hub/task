@@ -22,7 +22,7 @@ function App() {
 
   const fetchTasks = async () => {
     try {
-      const res = await axios.get(" https://task-npud.onrender.com/tasks");
+      const res = await axios.get("https://task-npud.onrender.com/tasks");
       setTasks(res.data);
     } catch (error) {
       console.log(error);
@@ -43,7 +43,7 @@ function App() {
       };
 
       const res = await axios.post(
-        " https://task-npud.onrender.com/tasks",
+        "https://task-npud.onrender.com/tasks",
         newTask
       );
 

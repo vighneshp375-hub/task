@@ -123,11 +123,9 @@ function App() {
           {tasks.map((task) => (
             <div className="col-md-4 mb-3" key={task._id}>
               <TaskCard
-                task={{
-                  title: task.subject,
-                  description: task.taskDetails,
-                  dueDate: task.deadline,
-                }}
+                task={task}
+               isDarkMode={isDarkMode}
+                deleteTask={() => deleteTask(task._id)}
                 isDarkMode={isDarkMode}
                 deleteTask={() => deleteTask(task._id)}
               />

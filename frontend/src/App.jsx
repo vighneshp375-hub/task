@@ -1,44 +1,59 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import TaskCard from "./TaskCard";
-import StudyNavbar from "./StudyNavbar";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 import StudyLoginPage from "./StudyLoginPage";
-import "./App.css";
+import StudyNavbar from "./StudyNavbar";
+import TaskCard from "./TaskCard";
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [isDarkmode, setIsDarkmode] = useState(false);
-
-  const [subject, setSubject] = useState("");
-  const [taskDetails, setTaskDetails] = useState("");
-  const [deadline, setDeadline] = useState("");
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const [tasks, setTasks] = useState([]);
 
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [dueDate, setDueDate] = useState("");
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
+    try {
+      const res = await axios.get(" https://task-npud.onrender.com/tasks");
+      setTasks(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const addTask = async () => {
-    if (!subject || !taskDetails || !deadline) {
+    if (!title || !description || !dueDate) {
       alert("Please fill all fields");
       return;
     }
 
     try {
-      const response = await axios.post(
-        "https://task-npud.onrender.com/tasks",
-        {
-          subject,
-          taskDetails,
-          deadline,
-        }
+      const newTask = {
+        subject: title,
+        taskDetails: description,
+        deadline: dueDate,
+      };
+
+      const res = await axios.post(
+        " https://task-npud.onrender.com/tasks",
+        newTask
       );
 
-      setTasks([...tasks, response.data]);
+      setTasks([...tasks, res.data]);
 
-      setSubject("");
-      setTaskDetails("");
-      setDeadline("");
+      setTitle("");
+      setDescription("");
+      setDueDate("");
     } catch (error) {
-      console.error(error);
-      alert("Failed to save task");
+      console.log(error);
     }
   };
 
@@ -48,57 +63,52 @@ function App() {
 
       setTasks(tasks.filter((task) => task._id !== id));
     } catch (error) {
-      console.error(error);
-      alert("Failed to delete task");
+      console.log(error);
     }
   };
 
   if (!isLoggedIn) {
-    return (
-      <StudyLoginPage
-        setIsLoggedIn={setIsLoggedIn}
-      />
-    );
+    return <StudyLoginPage setIsLoggedIn={setIsLoggedIn} />;
   }
 
   return (
     <div
       className={
-        isDarkmode
+        isDarkMode
           ? "bg-dark text-light min-vh-100"
           : "bg-light min-vh-100"
       }
     >
       <StudyNavbar
-        isDarkmode={isDarkmode}
-        setIsDarkmode={setIsDarkmode}
+        isDarkMode={isDarkMode}
+        setIsDarkMode={setIsDarkMode}
         setIsLoggedIn={setIsLoggedIn}
       />
 
       <div className="container py-4">
         <div className="card shadow p-4 mb-4">
-          <h3 className="mb-3">Add Study Task</h3>
+          <h3 className="mb-3">Add New Task</h3>
 
           <input
             type="text"
             className="form-control mb-3"
-            placeholder="Subject"
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
+            placeholder="Task Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
           />
 
           <textarea
             className="form-control mb-3"
-            placeholder="Task Details"
-            value={taskDetails}
-            onChange={(e) => setTaskDetails(e.target.value)}
+            placeholder="Task Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
           />
 
           <input
             type="date"
             className="form-control mb-3"
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
           />
 
           <button
@@ -110,28 +120,19 @@ function App() {
         </div>
 
         <div className="row">
-          {tasks.length === 0 ? (
-            <div className="text-center">
-              <h5>No tasks added yet.</h5>
+          {tasks.map((task) => (
+            <div className="col-md-4 mb-3" key={task._id}>
+              <TaskCard
+                task={{
+                  title: task.subject,
+                  description: task.taskDetails,
+                  dueDate: task.deadline,
+                }}
+                isDarkMode={isDarkMode}
+                deleteTask={() => deleteTask(task._id)}
+              />
             </div>
-          ) : (
-            tasks.map((task) => (
-              <div
-                key={task._id}
-                className="col-md-4 mb-3"
-              >
-                <TaskCard
-                  task={task}
-                  deadline={task.deadline}
-                  taskDetails={task.taskDetails}
-                  isDarkmode={isDarkmode}
-                  deleteTask={() =>
-                    deleteTask(task._id)
-                  }
-                />
-              </div>
-            ))
-          )}
+          ))}
         </div>
       </div>
     </div>

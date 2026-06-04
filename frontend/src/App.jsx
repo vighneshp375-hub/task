@@ -23,7 +23,7 @@ function App() {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/tasks",
+        "https://task-npud.onrender.com/tasks",
         {
           subject,
           taskDetails,
@@ -44,7 +44,7 @@ function App() {
 
   const deleteTask = async (id) => {
     try {
-      await axios.delete(`http://localhost:3000/tasks/${id}`);
+      await axios.delete(`https://task-npud.onrender.com/tasks/${id}`);
 
       setTasks(tasks.filter((task) => task._id !== id));
     } catch (error) {
